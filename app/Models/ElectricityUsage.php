@@ -2,11 +2,28 @@
 
 namespace App\Models;
 
+use Database\Factories\ElectricityUsageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $customer_name
+ * @property int $building_type_id
+ * @property int $month
+ * @property int $usage_kwh
+ * @property int $state_id
+ * @property string $bill_amount
+ * @property list<array{up_to_kwh: int|null, rate: string, units: int, amount: string}> $tariff_snapshot
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read BuildingType $buildingType
+ * @property-read State $state
+ */
 class ElectricityUsage extends Model
 {
     /** @use HasFactory<ElectricityUsageFactory> */

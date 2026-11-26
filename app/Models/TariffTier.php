@@ -5,6 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $building_type_id
+ * @property int|null $up_to_kwh
+ * @property string $rate
+ * @property-read BuildingType $buildingType
+ */
 class TariffTier extends Model
 {
     protected $fillable = ['building_type_id', 'up_to_kwh', 'rate'];

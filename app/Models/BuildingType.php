@@ -15,6 +15,7 @@ class BuildingType extends Model
         return ['code' => BuildingTypeCode::class];
     }
 
+    /** @return HasMany<TariffTier, $this> */
     public function tariffTiers(): HasMany
     {
         return $this->hasMany(TariffTier::class)->orderByRaw('up_to_kwh ASC NULLS LAST');
