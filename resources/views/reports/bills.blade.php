@@ -1,9 +1,10 @@
 @php use App\Enums\Month; @endphp
 
-<x-layouts.app title="Bill report">
+<x-layouts.app>
+    <x-page-header title="Bill report"></x-page-header>
     {{-- Current tariff rates, for reference --}}
-    <div class="mb-6 rounded border bg-white">
-        <h2 class="border-b px-4 py-3 text-sm font-semibold">Current tariff rates</h2>
+    <x-card class="mb-6">
+        <h2 class="border-b border-gray-400 px-4 py-3 text-sm font-semibold">Current tariff rates</h2>
         <table class="min-w-full text-sm">
             <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-600">
                 <tr>
@@ -12,7 +13,7 @@
                     <th class="px-4 py-2 text-right">Rate (RM/kWh)</th>
                 </tr>
             </thead>
-            <tbody class="divide-y">
+            <tbody class="divide-y divide-gray-100">
                 @foreach ($buildingTypes as $type)
                     @php $from = 1; @endphp
                     @foreach ($type->tariffTiers as $tier)
@@ -31,47 +32,46 @@
         <p class="border-t px-4 py-2 text-xs text-gray-500">
             Bills below use the rates in effect when each record was calculated.
         </p>
-    </div>
+    </x-card>
 
     {{-- Filters --}}
-    <form method="GET" action="{{ route('reports.bills') }}"
-          class="mb-4 flex flex-wrap items-end gap-4 rounded border bg-white p-4">
-        <div>
-            <label for="month" class="block text-xs font-medium text-gray-600">Month</label>
-            <select id="month" name="month" class="mt-1 rounded border border-gray-300 px-3 py-2 text-sm">
-                <option value="">All</option>
-                @foreach ($months as $month)
-                    <option value="{{ $month->value }}" @selected($filters->month === $month->value)>
-                        {{ $month->label() }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+    <x-card class="mb-6">
+        <form method="GET" action="{{ route('reports.bills') }} "class=" flex flex-wrap items-end gap-4 p-4">
+            <div>
+                <label for="month" class="block text-xs font-medium text-gray-600">Month</label>
+                <select id="month" name="month" class="block w-full min-w-44 rounded-md border-gray-300 shadow-sm focus:border-brand-600 focus:ring-brand-600 sm:text-sm">
+                    <option value="">All</option>
+                    @foreach ($months as $month)
+                        <option value="{{ $month->value }}" @selected($filters->month === $month->value)>
+                            {{ $month->label() }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-        <div>
-            <label for="building_type_id" class="block text-xs font-medium text-gray-600">Building type</label>
-            <select id="building_type_id" name="building_type_id" class="mt-1 rounded border border-gray-300 px-3 py-2 text-sm">
-                <option value="">All</option>
-                @foreach ($buildingTypes as $type)
-                    <option value="{{ $type->id }}" @selected($filters->buildingTypeId === $type->id)>
-                        {{ $type->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+            <div>
+                <label for="building_type_id" class="block text-xs font-medium text-gray-600">Building type</label>
+                <select id="building_type_id" name="building_type_id" class="block w-full min-w-44 rounded-md border-gray-300 shadow-sm focus:border-brand-600 focus:ring-brand-600 sm:text-sm">
+                    <option value="">All</option>
+                    @foreach ($buildingTypes as $type)
+                        <option value="{{ $type->id }}" @selected($filters->buildingTypeId === $type->id)>
+                            {{ $type->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-        <button type="submit" class="rounded bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900">
-            Search
-        </button>
+            <x-button type="submit" variant="secondary">Search</x-button>
 
-        @if ($filters->isFiltered())
-            <a href="{{ route('reports.bills') }}" class="py-2 text-sm text-gray-600 hover:underline">Reset</a>
-        @endif
-    </form>
+            @if ($filters->isFiltered())
+                <x-button variant="dark" :href="route('reports.bills')">Reset</x-button>
+            @endif
+        </form>
+    </x-card>
 
     {{-- Report table --}}
-    <div class="overflow-x-auto rounded border bg-white">
-        <table class="min-w-full divide-y text-sm">
+    <x-card class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-400 text-sm">
             <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-600">
                 <tr>
                     <th class="px-4 py-3">No</th>
@@ -82,19 +82,23 @@
                     <th class="px-4 py-3 text-right">Bill (RM)</th>
                 </tr>
             </thead>
-            <tbody class="divide-y">
+            <tbody class="divide-y divide-gray-100">
                 @forelse ($rows as $row)
                     <tr>
                         <td class="px-4 py-3">{{ $rows->firstItem() + $loop->index }}</td>
                         <td class="px-4 py-3">
-                            <a href="{{ route('usages.show', $row) }}" class="text-blue-700 hover:underline">
+                            <x-button variant="link" :href="route('usages.show', $row)" class="ml-2 !text-gray-600">
                                 {{ $row->customer_name }}
-                            </a>
+                            </x-button>
                         </td>
                         <td class="px-4 py-3">{{ Month::from($row->month)->label() }}</td>
-                        <td class="px-4 py-3">{{ $row->buildingType->name }}</td>
+                        <td class="px-4 py-3">
+                            <x-badge :color="$row->buildingType->code->value === 'COMMERCIAL' ? 'blue' : 'amber'">
+                                {{ $row->buildingType->name }}
+                            </x-badge>
+                        </td>
                         <td class="px-4 py-3 text-right">{{ number_format($row->usage_kwh) }}</td>
-                        <td class="px-4 py-3 text-right">{{ $row->bill_amount }}</td>
+                        <td class="px-4 py-3 text-right tabular-nums">{{ $row->bill_amount }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -109,12 +113,12 @@
                             Total ({{ $totals->records }} {{ Str::plural('record', $totals->records) }})
                         </td>
                         <td class="px-4 py-3 text-right">{{ number_format((int) $totals->total_kwh) }}</td>
-                        <td class="px-4 py-3 text-right">{{ number_format((float) $totals->total_bill, 2) }}</td>
+                        <td class="px-4 py-3 text-right tabular-nums">{{ number_format((float) $totals->total_bill, 2) }}</td>
                     </tr>
                 </tfoot>
             @endif
         </table>
-    </div>
+    </x-card>
 
     <div class="mt-4">
         {{ $rows->links() }}

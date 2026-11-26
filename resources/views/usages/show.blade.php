@@ -1,8 +1,10 @@
 @php use App\Enums\Month; @endphp
 
-<x-layouts.app title="Record details">
+<x-layouts.app>
+    <x-page-header title="Record details"></x-page-header>
+
     <div class="max-w-2xl space-y-6">
-        <dl class="grid grid-cols-3 gap-x-4 gap-y-3 rounded border bg-white p-6 text-sm">
+        <x-card class="grid grid-cols-3 gap-x-4 gap-y-3 rounded border bg-white p-6 text-sm">
             <dt class="text-gray-500">Customer name</dt>
             <dd class="col-span-2 font-medium">{{ $usage->customer_name }}</dd>
 
@@ -20,10 +22,10 @@
 
             <dt class="text-gray-500">Recorded</dt>
             <dd class="col-span-2">{{ $usage->created_at?->format('d M Y, h:i A') }}</dd>
-        </dl>
+        </x-card>
 
-        <div class="rounded border bg-white">
-            <h2 class="border-b px-6 py-3 font-semibold">Bill breakdown</h2>
+        <x-card>
+            <h2 class="border-b border-gray-400 px-6 py-3 font-semibold">Bill breakdown</h2>
 
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-600">
@@ -31,10 +33,10 @@
                         <th class="px-6 py-2">Tier</th>
                         <th class="px-6 py-2 text-right">kWh</th>
                         <th class="px-6 py-2 text-right">Rate (RM/kWh)</th>
-                        <th class="px-6 py-2 text-right">Amount (RM)</th>
+                        <th class="px-6 py-2 text-right tabular-nums">Amount (RM)</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y">
+                <tbody class="divide-y divide-gray-100">
                     @php $from = 1; @endphp
                     @forelse ($usage->tariff_snapshot as $line)
                         <tr>
@@ -52,7 +54,7 @@
                         </tr>
                     @endforelse
                 </tbody>
-                <tfoot class="border-t bg-gray-50 font-semibold">
+                <tfoot class="border-t border-gray-400 bg-gray-50 font-semibold">
                     <tr>
                         <td class="px-6 py-3" colspan="3">Total</td>
                         <td class="px-6 py-3 text-right">RM {{ $usage->bill_amount }}</td>
@@ -60,23 +62,17 @@
                 </tfoot>
             </table>
 
-            <p class="border-t px-6 py-3 text-xs text-gray-500">
+            <p class="border-t border-gray-400 px-6 py-3 text-xs text-gray-500">
                 Rates shown are those in effect when this bill was calculated.
             </p>
-        </div>
+        </x-card>
 
         <div class="flex items-center gap-3">
-            <a href="{{ route('usages.edit', $usage) }} "class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Edit</a>
+            <x-button :href="route('usages.edit', $usage)">Edit</x-button>
 
-            <form method="POST" action="{{ route('usages.destroy', $usage) }} "onsubmit="return confirm('Delete the record for {{ e($usage->customer_name) }}?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50">
-                    Delete
-                </button>
-            </form>
+            <x-delete-button variant="danger" :action="route('usages.destroy', $usage)" :name="$usage->customer_name" />
 
-            <a href="{{ route('usages.index') }}" class="px-2 py-2 text-sm text-gray-600 hover:underline">Back to records</a>
+            <x-button variant="link" :href="route('usages.index')" class="!text-gray-600">Back to records</x-button>
         </div>
     </div>
 </x-layouts.app>

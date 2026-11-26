@@ -1,61 +1,59 @@
 @php use App\Enums\Month; @endphp
 
-<x-layouts.app title="Electricity usage records">
-    <div class="mb-4 flex justify-end">
-        <a href="{{ route('usages.create') }}"
-           class="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
-            New record
-        </a>
-    </div>
+<x-layouts.app>
+    <x-page-header title="Electricity usage records" description="Search, sort and manage customer usage.">
+        <x-slot:actions>
+            <x-button :href="route('usages.create')">New record</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
-    <form method="GET" action="{{ route('usages.index') }} "class="mb-4 flex flex-wrap items-end gap-4 rounded border bg-white p-4">
-        {{-- Keep the current sort when filtering --}}
-        @if ($filters->sort)
-            <input type="hidden" name="sort" value="{{ $filters->sort->value }}">
-            <input type="hidden" name="direction" value="{{ $filters->direction->value }}">
-        @endif
+    <x-card class="mb-4 p-4">
+        <form method="GET" action="{{ route('usages.index') }} "class="mb-4 flex flex-wrap items-end gap-4 bg-white p-4">
+            {{-- Keep the current sort when filtering --}}
+            @if ($filters->sort)
+                <input type="hidden" name="sort" value="{{ $filters->sort->value }}">
+                <input type="hidden" name="direction" value="{{ $filters->direction->value }}">
+            @endif
 
-        <div>
-            <label for="filter_building_type" class="block text-xs font-medium text-gray-600">Building type</label>
-            <select id="filter_building_type" name="building_type_id"
-                    class="mt-1 rounded border border-gray-300 px-3 py-2 text-sm">
-                <option value="">All</option>
-                @foreach ($buildingTypes as $type)
-                    <option value="{{ $type->id }}" @selected($filters->buildingTypeId === $type->id)>
-                        {{ $type->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+            <div>
+                <label for="filter_building_type" class="block text-xs font-medium text-gray-600">Building type</label>
+                <select id="filter_building_type" name="building_type_id"
+                        class="mt-1 rounded border border-gray-300 px-3 py-2 text-sm">
+                    <option value="">All</option>
+                    @foreach ($buildingTypes as $type)
+                        <option value="{{ $type->id }}" @selected($filters->buildingTypeId === $type->id)>
+                            {{ $type->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-        <div>
-            <label for="filter_state" class="block text-xs font-medium text-gray-600">State</label>
-            <select id="filter_state" name="state_id"
-                    class="mt-1 rounded border border-gray-300 px-3 py-2 text-sm">
-                <option value="">All</option>
-                @foreach ($states as $state)
-                    <option value="{{ $state->id }}" @selected($filters->stateId === $state->id)>
-                        {{ $state->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+            <div>
+                <label for="filter_state" class="block text-xs font-medium text-gray-600">State</label>
+                <select id="filter_state" name="state_id" class="mt-1 rounded border border-gray-300 px-3 py-2 text-sm">
+                    <option value="">All</option>
+                    @foreach ($states as $state)
+                        <option value="{{ $state->id }}" @selected($filters->stateId === $state->id)>
+                            {{ $state->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-        <button type="submit" class="rounded bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900">
-            Search
-        </button>
+           <x-button type="submit" variant="secondary">Search</x-button>
 
-        @if ($filters->isFiltered() || $filters->sort)
-            <a href="{{ route('usages.index') }}" class="py-2 text-sm text-gray-600 hover:underline">Reset</a>
-        @endif
+            @if ($filters->isFiltered() || $filters->sort)
+                <x-button variant="dark" :href="route('usages.index')">Reset</x-button>
+            @endif
 
-        <p class="ml-auto self-center text-sm text-gray-500">
-            {{ $usages->total() }} {{ Str::plural('record', $usages->total()) }}
-        </p>
-    </form>
+            <p class="ml-auto self-center text-sm text-gray-500">
+                {{ $usages->total() }} {{ Str::plural('record', $usages->total()) }}
+            </p>
+        </form>
+    </x-card>
 
-    <div class="overflow-x-auto rounded border bg-white">
-        <table class="min-w-full divide-y text-sm">
+    <x-card class="overflow-x-auto bg-white">
+        <table class="min-w-full divide-y divide-gray-400 text-sm">
             <thead class="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-600">
                 <tr>
                     <th class="px-4 py-3">No</th>
@@ -74,30 +72,28 @@
                     <th class="px-4 py-3"><span class="sr-only">Actions</span></th>
                 </tr>
             </thead>
-            <tbody class="divide-y">
+            <tbody class="divide-y divide-gray-100 bg-white">
                 @forelse ($usages as $usage)
                     <tr>
                         <td class="px-4 py-3">{{ $usages->firstItem() + $loop->index }}</td>
                         <td class="px-4 py-3">
-                            <a href="{{ route('usages.show', $usage) }}" class="text-blue-700 hover:underline">
+                            <x-button variant="link" :href="route('usages.show', $usage)" class="ml-2 !text-gray-600">
                                 {{ $usage->customer_name }}
-                            </a>
+                            </x-button>
                         </td>
-                        <td class="px-4 py-3">{{ $usage->buildingType->name }}</td>
+                        <td class="px-4 py-3">
+                            <x-badge :color="$usage->buildingType->code->value === 'COMMERCIAL' ? 'blue' : 'amber'">
+                                {{ $usage->buildingType->name }}
+                            </x-badge>
+                        </td>
                         <td class="px-4 py-3">{{ Month::from($usage->month)->label() }}</td>
                         <td class="px-4 py-3 text-right">{{ number_format($usage->usage_kwh) }}</td>
                         <td class="px-4 py-3">{{ $usage->state->name }}</td>
-                        <td class="px-4 py-3 text-right">{{ $usage->bill_amount }}</td>
+                        <td class="px-4 py-3 text-right tabular-nums">{{ $usage->bill_amount }}</td>
                         <td class="px-4 py-3">
-                            <div class="flex justify-end gap-3">
-                                <a href="{{ route('usages.edit', $usage) }}" class="text-blue-700 hover:underline">Edit</a>
-
-                                <form method="POST" action="{{ route('usages.destroy', $usage) }}"
-                                      onsubmit="return confirm('Delete the record for {{ e($usage->customer_name) }}?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-700 hover:underline">Delete</button>
-                                </form>
+                            <div class="flex justify-end gap-4">
+                                <x-button variant="link" :href="route('usages.edit', $usage)">Edit</x-button>
+                                <x-delete-button :action="route('usages.destroy', $usage)" :name="$usage->customer_name" />
                             </div>
                         </td>
                     </tr>
@@ -108,7 +104,7 @@
                 @endforelse
             </tbody>
         </table>
-    </div>
+    </x-card>
 
     <div class="mt-4">
         {{ $usages->links() }}

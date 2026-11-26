@@ -1,26 +1,22 @@
 @php
     /** @var \App\Models\ElectricityUsage|null $usage */
     $usage ??= null;
-    $input = 'mt-1 block w-full rounded border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500';
+    $input = 'block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-600 focus:ring-brand-600 sm:text-sm';
 @endphp
 
 <div class="space-y-5">
-    {{-- Customer name --}}
-    <div>
-        <label for="customer_name" class="block text-sm font-medium">Customer name</label>
-        <input type="text" id="customer_name" name="customer_name" maxlength="150" required
-               value="{{ old('customer_name', $usage?->customer_name) }}"
-               class="{{ $input }} border">
-        @error('customer_name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-    </div>
+    <x-field label="Customer name" for="customer_name">
+        <input type="text" id="customer_name" name="customer_name" maxlength="150" required value="{{ old('customer_name', $usage?->customer_name) }}" class="{{ $input }}">
+    </x-field>
 
-    {{-- Building type --}}
+    {{-- Radio group: a fieldset with a legend, not a single label/input pair --}}
     <fieldset>
-        <legend class="block text-sm font-medium">Building type</legend>
+        <legend class="block text-sm font-medium text-gray-700">Building type</legend>
         <div class="mt-2 flex gap-6">
             @foreach ($buildingTypes as $type)
-                <label class="inline-flex items-center gap-2 text-sm">
+                <label class="inline-flex items-center gap-2 text-sm text-gray-700">
                     <input type="radio" name="building_type_id" value="{{ $type->id }}" required
+                           class="border-gray-300 text-brand-600 focus:ring-brand-600"
                            @checked((string) old('building_type_id', $usage?->building_type_id) === (string) $type->id)>
                     {{ $type->name }}
                 </label>
@@ -29,10 +25,8 @@
         @error('building_type_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
     </fieldset>
 
-    {{-- Month --}}
-    <div>
-        <label for="month" class="block text-sm font-medium">Month</label>
-        <select id="month" name="month" required class="{{ $input }} border">
+    <x-field label="Month" for="month">
+        <select id="month" name="month" required class="{{ $input }}">
             <option value="">Please select</option>
             @foreach ($months as $month)
                 <option value="{{ $month->value }}"
@@ -41,23 +35,17 @@
                 </option>
             @endforeach
         </select>
-        @error('month') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-    </div>
+    </x-field>
 
-    {{-- Usability (kWh) --}}
-    <div>
-        <label for="usage_kwh" class="block text-sm font-medium">Usability (kWh)</label>
+    <x-field label="Usability (kWh)" for="usage_kwh" hint="Whole kWh only, e.g. 159.">
         <input type="number" id="usage_kwh" name="usage_kwh" min="0" max="1000000" step="1" required
                placeholder="159"
                value="{{ old('usage_kwh', $usage?->usage_kwh) }}"
-               class="{{ $input }} border">
-        @error('usage_kwh') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-    </div>
+               class="{{ $input }}">
+    </x-field>
 
-    {{-- State --}}
-    <div>
-        <label for="state_id" class="block text-sm font-medium">State</label>
-        <select id="state_id" name="state_id" required class="{{ $input }} border">
+    <x-field label="State" for="state_id">
+        <select id="state_id" name="state_id" required class="{{ $input }}">
             <option value="">Please select</option>
             @foreach ($states as $state)
                 <option value="{{ $state->id }}"
@@ -66,6 +54,5 @@
                 </option>
             @endforeach
         </select>
-        @error('state_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-    </div>
+    </x-field>
 </div>

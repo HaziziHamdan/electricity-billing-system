@@ -1,9 +1,17 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+@plugin '@tailwindcss/forms';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+    /* One accent colour, used for primary actions, links and active nav */
+    --color-brand-50: oklch(0.97 0.02 250);
+    --color-brand-100: oklch(0.93 0.04 250);
+    --color-brand-600: oklch(0.52 0.17 255);
+    --color-brand-700: oklch(0.45 0.16 255);
 }

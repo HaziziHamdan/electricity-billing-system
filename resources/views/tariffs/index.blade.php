@@ -1,14 +1,12 @@
-<x-layouts.app title="Tariff rates">
-    <p class="mb-6 text-sm text-gray-600">
-        New and recalculated bills use these rates. Existing bills keep the rates they were calculated with.
-    </p>
+<x-layouts.app>
+    <x-page-header title="Tariff rates" description="New and recalculated bills use these rates. Existing bills keep the rates they were calculated with."></x-page-header>
 
     <div class="grid gap-6 md:grid-cols-2">
         @foreach ($buildingTypes as $type)
-            <div class="rounded border bg-white">
-                <div class="flex items-center justify-between border-b px-4 py-3">
+            <x-card class="bg-white">
+                <div class="flex items-center justify-between px-4 py-3">
                     <h2 class="font-semibold">{{ $type->name }}</h2>
-                    <a href="{{ route('tariffs.edit', $type) }}" class="text-sm text-blue-700 hover:underline">Edit rates</a>
+                    <x-button variant="link" :href="route('tariffs.edit', $type)">Edit rates</x-button>
                 </div>
 
                 <table class="min-w-full text-sm">
@@ -18,7 +16,7 @@
                             <th class="px-4 py-2 text-right">Rate (RM/kWh)</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y">
+                    <tbody class="divide-y divide-gray-100">
                         @php $from = 1; @endphp
                         @forelse ($type->tariffTiers as $tier)
                             <tr>
@@ -35,7 +33,7 @@
                         @endforelse
                     </tbody>
                 </table>
-            </div>
+            </x-card>
         @endforeach
     </div>
 </x-layouts.app>
