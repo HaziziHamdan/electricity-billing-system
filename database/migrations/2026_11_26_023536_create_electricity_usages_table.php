@@ -23,6 +23,8 @@ return new class extends Migration
             $table->foreignId('state_id')
                 ->constrained()
                 ->restrictOnDelete();
+            $table->decimal('bill_amount', 12, 2);          // frozen at time of calculation
+            $table->jsonb('tariff_snapshot');
             $table->timestamps();
             $table->softDeletes();
             $table->index('building_type_id');
@@ -33,6 +35,7 @@ return new class extends Migration
 
         DB::statement('ALTER TABLE electricity_usages ADD CONSTRAINT electricity_usages_month_range CHECK (month BETWEEN 1 AND 12)');
         DB::statement('ALTER TABLE electricity_usages ADD CONSTRAINT electricity_usages_usage_non_negative CHECK (usage_kwh >= 0)');
+        DB::statement('ALTER TABLE electricity_usages ADD CONSTRAINT electricity_usages_bill_non_negative CHECK (bill_amount >= 0)');
     }
 
     /**

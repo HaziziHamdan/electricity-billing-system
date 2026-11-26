@@ -12,7 +12,25 @@ class ElectricityUsage extends Model
     /** @use HasFactory<ElectricityUsageFactory> */
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['customer_name', 'building_type_id', 'month', 'usage_kwh', 'state_id'];
+    protected $fillable = [
+        'customer_name',
+        'building_type_id',
+        'month',
+        'usage_kwh',
+        'state_id',
+        'bill_amount',
+        'tariff_snapshot',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'month' => 'integer',
+            'usage_kwh' => 'integer',
+            'bill_amount' => 'decimal:2',
+            'tariff_snapshot' => 'array',
+        ];
+    }
 
     /** @return BelongsTo<BuildingType, $this> */
     public function buildingType(): BelongsTo

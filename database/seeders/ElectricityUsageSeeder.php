@@ -25,7 +25,7 @@ class ElectricityUsageSeeder extends Seeder
         ];
 
         foreach ($samples as [$name, $month, $typeCode, $kwh]) {
-            ElectricityUsage::create([
+            ElectricityUsage::factory()->create([
                 'customer_name' => $name,
                 'building_type_id' => $buildingTypeIds[$typeCode],
                 'month' => $month,
