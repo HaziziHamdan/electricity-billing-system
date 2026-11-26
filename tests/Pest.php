@@ -1,5 +1,12 @@
 <?php
 
+use App\Models\BuildingType;
+use App\Models\ElectricityUsage;
+use App\Models\State;
+use App\Models\TariffTier;
+use Database\Seeders\BuildingTypeSeeder;
+use Database\Seeders\StateSeeder;
+use Database\Seeders\TariffTierSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +22,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -47,4 +54,62 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+function seedReferenceData(): void
+{
+    test()->seed([BuildingTypeSeeder::class, StateSeeder::class, TariffTierSeeder::class]);
+}
+
+function buildingTypeId(string $code): int
+{
+    return (int) BuildingType::where('code', $code)->value('id');
+}
+
+function stateId(string $code): int
+{
+    return (int) State::where('code', $code)->value('id');
+}
+
+/** @param array<string, mixed> $attributes */
+function makeUsage(array $attributes = []): ElectricityUsage
+{
+    return ElectricityUsage::factory()->create([
+        'customer_name' => 'TEST CUSTOMER',
+        'building_type_id' => buildingTypeId('COMMERCIAL'),
+        'month' => 6,
+        'usage_kwh' => 210,
+        'state_id' => stateId('SGR'),
+        ...$attributes,
+    ]);
+}
+
+/**
+ * Valid form payload, with optional overrides.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function usagePayload(array $overrides = []): array
+{
+    return [
+        'customer_name' => 'JOHN',
+        'building_type_id' => buildingTypeId('COMMERCIAL'),
+        'month' => 6,
+        'usage_kwh' => 210,
+        'state_id' => stateId('SGR'),
+        ...$overrides,
+    ];
+}
+
+function setTierRate(string $buildingTypeCode, ?int $upToKwh, string $rate): void
+{
+    TariffTier::query()
+        ->where('building_type_id', buildingTypeId($buildingTypeCode))
+        ->when(
+            $upToKwh === null,
+            fn ($q) => $q->whereNull('up_to_kwh'),
+            fn ($q) => $q->where('up_to_kwh', $upToKwh),
+        )
+        ->update(['rate' => $rate]);
 }
