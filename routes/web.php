@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/usages');
 
-Route::resource('usages', ElectricityUsageController::class)->except('show');
+Route::resource('usages', ElectricityUsageController::class);
 
 // Added in later steps:
 // Route::get('reports/bills', BillReportController::class)->name('reports.bills');

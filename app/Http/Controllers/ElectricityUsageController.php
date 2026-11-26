@@ -34,6 +34,13 @@ class ElectricityUsageController extends Controller
         ]);
     }
 
+    public function show(ElectricityUsage $usage): View
+    {
+        $usage->load(['buildingType', 'state']);
+
+        return view('usages.show', ['usage' => $usage]);
+    }
+
     public function create(): View
     {
         return view('usages.create', $this->formOptions());
