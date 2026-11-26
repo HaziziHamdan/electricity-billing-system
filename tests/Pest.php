@@ -7,6 +7,7 @@ use App\Models\TariffTier;
 use Database\Seeders\BuildingTypeSeeder;
 use Database\Seeders\StateSeeder;
 use Database\Seeders\TariffTierSeeder;
+// use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,6 +24,7 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    // ->use(DatabaseTruncation::class)
     ->in('Feature');
 
 /*
