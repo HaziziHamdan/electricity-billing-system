@@ -9,7 +9,11 @@ Built for the iTools PHP skill test.
 
 > Hosted on a free tier: the first request after a period of inactivity may take up to a minute while the server wakes up.
 
-<!-- Screenshots: records listing · record detail with bill breakdown · bill report · tariff editor -->
+| Records                                 | Bill breakdown                           |
+| --------------------------------------- | ---------------------------------------- |
+| ![Records](docs/screenshots/usages.png) | ![Detail](docs/screenshots/detail.png)   |
+| **Bill report**                         | **Tariff rates**                         |
+| ![Report](docs/screenshots/report.png)  | ![Tariffs](docs/screenshots/tariffs.png) |
 
 ## Features
 
@@ -97,7 +101,7 @@ rolled back, so the development database is never touched.
 Browser ──► Cloudflare DNS ──► Render (Docker: PHP 8.4 + Apache) ──► Supabase PostgreSQL (session pooler)
 ```
 
-![Architecture](docs/architecture.drawio.svg)
+![Architecture](docs/architecture.svg)
 
 ### Docker image
 
