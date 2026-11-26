@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\BillReportController;
 use App\Http\Controllers\ElectricityUsageController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/usages');
 
 Route::resource('usages', ElectricityUsageController::class);
+Route::get('reports/bills', BillReportController::class)->name('reports.bills');
 
 // Added in later steps:
 // Route::get('reports/bills', BillReportController::class)->name('reports.bills');

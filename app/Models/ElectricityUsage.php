@@ -72,7 +72,8 @@ class ElectricityUsage extends Model
     {
         $query
             ->when($filters->buildingTypeId, fn (Builder $q, int $id) => $q->where('building_type_id', $id))
-            ->when($filters->stateId, fn (Builder $q, int $id) => $q->where('state_id', $id));
+            ->when($filters->stateId, fn (Builder $q, int $id) => $q->where('state_id', $id))
+            ->when($filters->month, fn (Builder $q, int $month) => $q->where('month', $month));
     }
 
     /**

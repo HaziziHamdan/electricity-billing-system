@@ -11,6 +11,7 @@ final readonly class UsageFilters
     public function __construct(
         public ?int $buildingTypeId = null,
         public ?int $stateId = null,
+        public ?int $month = null,
         public ?UsageSortField $sort = null,
         public SortDirection $direction = SortDirection::Asc,
     ) {}
@@ -24,24 +25,32 @@ final readonly class UsageFilters
         return new self(
             buildingTypeId: self::positiveInt($request->query('building_type_id')),
             stateId: self::positiveInt($request->query('state_id')),
-            sort: UsageSortField::tryFrom(self::string($request->query('sort'))),
-            direction: SortDirection::tryFrom(self::string($request->query('direction'))) ?? SortDirection::Asc,
+            month: self::positiveInt($request->query('month'), max: 12),
+            sort: UsageSortField::tryFrom(self::stringOrEmpty($request->query('sort'))),
+            direction: SortDirection::tryFrom(self::stringOrEmpty($request->query('direction'))) ?? SortDirection::Asc,
         );
     }
 
     public function isFiltered(): bool
     {
-        return $this->buildingTypeId !== null || $this->stateId !== null;
+        return $this->buildingTypeId !== null || $this->stateId !== null || $this->month !== null;
     }
 
-    private static function positiveInt(mixed $value): ?int
+    private static function positiveInt(mixed $value, ?int $max = null): ?int
     {
-        $int = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $options = ['min_range' => 1];
+
+        if ($max !== null) {
+            $options['max_range'] = $max;
+        }
+
+        $int = filter_var($value, FILTER_VALIDATE_INT, ['options' => $options]);
 
         return $int === false ? null : $int;
     }
 
-    private static function string(mixed $value): string
+    /** Arrays (e.g. ?sort[]=x) and nulls become '', which tryFrom() rejects safely. */
+    private static function stringOrEmpty(mixed $value): string
     {
         return is_string($value) ? $value : '';
     }
