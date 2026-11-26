@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\UsageFilters;
 use App\Enums\Month;
 use App\Http\Requests\StoreElectricityUsageRequest;
 use App\Http\Requests\UpdateElectricityUsageRequest;
@@ -21,15 +22,18 @@ class ElectricityUsageController extends Controller
 
     public function index(Request $request): View
     {
-        // Filters and sorting are added with the query scopes in step 3.
+        $filters = UsageFilters::fromRequest($request);
+
         $usages = ElectricityUsage::query()
             ->with(['buildingType', 'state'])
-            ->latest('id')
+            ->filter($filters)
+            ->sorted($filters->sort, $filters->direction)
             ->paginate(15)
             ->withQueryString();
 
         return view('usages.index', [
             'usages' => $usages,
+            'filters' => $filters,
             ...$this->formOptions(),
         ]);
     }

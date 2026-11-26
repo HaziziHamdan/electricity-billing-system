@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Data;
+
+use App\Enums\SortDirection;
+use App\Enums\UsageSortField;
+use Illuminate\Http\Request;
+
+final readonly class UsageFilters
+{
+    public function __construct(
+        public ?int $buildingTypeId = null,
+        public ?int $stateId = null,
+        public ?UsageSortField $sort = null,
+        public SortDirection $direction = SortDirection::Asc,
+    ) {}
+
+    /**
+     * Lenient parsing: anything invalid falls back to "no filter" / default order,
+     * so a tampered query string never causes an error or a redirect loop.
+     */
+    public static function fromRequest(Request $request): self
+    {
+        return new self(
+            buildingTypeId: self::positiveInt($request->query('building_type_id')),
+            stateId: self::positiveInt($request->query('state_id')),
+            sort: UsageSortField::tryFrom(self::string($request->query('sort'))),
+            direction: SortDirection::tryFrom(self::string($request->query('direction'))) ?? SortDirection::Asc,
+        );
+    }
+
+    public function isFiltered(): bool
+    {
+        return $this->buildingTypeId !== null || $this->stateId !== null;
+    }
+
+    private static function positiveInt(mixed $value): ?int
+    {
+        $int = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+        return $int === false ? null : $int;
+    }
+
+    private static function string(mixed $value): string
+    {
+        return is_string($value) ? $value : '';
+    }
+}
